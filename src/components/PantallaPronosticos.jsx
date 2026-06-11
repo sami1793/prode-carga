@@ -127,10 +127,10 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         return {
           partido_id: p.id,
           goles_local: bloqueado
-            ? 0
+            ? -1
             : parseInt(pronosticos[p.id]?.goles_local || 0),
           goles_visitante: bloqueado
-            ? 0
+            ? -1
             : parseInt(pronosticos[p.id]?.goles_visitante || 0),
         };
       }),
