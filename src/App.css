@@ -535,3 +535,10 @@ body {
   padding: 0 0.5rem;
   text-align: center;
 }
+
+.partido-countdown {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--celeste);
+  letter-spacing: 0.03em;
+}
