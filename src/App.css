@@ -1,0 +1,516 @@
+/* ── TOKENS ── */
+:root {
+  --celeste: #75aadb;
+  --celeste-vivo: #4a90d9;
+  --blanco: #f0f4ff;
+  --fondo: #0d1117;
+  --fondo-card: #161b22;
+  --fondo-card2: #1c2230;
+  --borde: #2a3344;
+  --borde-activo: #4a90d9;
+  --texto: #e8edf5;
+  --texto-suave: #8b97ab;
+  --verde: #3fb950;
+  --rojo: #e05c5c;
+  --radio: 12px;
+  --radio-lg: 18px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── APP ── */
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
+/* ── HEADER ── */
+.header {
+  position: relative;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.header-banda {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    160deg,
+    transparent 0px,
+    transparent 38px,
+    rgba(117, 170, 219, 0.06) 38px,
+    rgba(117, 170, 219, 0.06) 76px
+  );
+  pointer-events: none;
+}
+
+.header-eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--celeste);
+  margin-bottom: 0.6rem;
+}
+
+.header-title {
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 40%, var(--celeste) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-sub {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  letter-spacing: 0.05em;
+}
+
+/* ── MAIN ── */
+.main {
+  padding: 0 1rem;
+}
+
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--celeste);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+.estado-msg {
+  text-align: center;
+  color: var(--texto-suave);
+  padding: 2rem 0;
+  font-size: 0.95rem;
+}
+.estado-msg.error {
+  color: var(--rojo);
+}
+
+/* ── BOTÓN PRIMARIO ── */
+.btn-primario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: var(--celeste-vivo);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
+}
+.btn-primario:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.btn-primario:disabled,
+.btn-primario--disabled {
+  background: var(--fondo-card2);
+  color: var(--texto-suave);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-spinner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── PANTALLA PIN ── */
+.pantalla-pin {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.pin-card {
+  width: 100%;
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.pin-icono {
+  font-size: 2.5rem;
+}
+
+.pin-titulo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--blanco);
+}
+
+.pin-desc {
+  font-size: 0.88rem;
+  color: var(--texto-suave);
+  line-height: 1.6;
+}
+
+.pin-input-wrap {
+  margin: 0.5rem 0;
+}
+
+.pin-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--fondo-card2);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+  color: var(--blanco);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.pin-input:focus {
+  border-color: var(--celeste-vivo);
+}
+.pin-input--error {
+  border-color: var(--rojo);
+}
+.pin-input::placeholder {
+  color: var(--texto-suave);
+  letter-spacing: 0.1em;
+  font-size: 1rem;
+}
+
+/* Ocultar flechas del input number en Chrome/Safari/Firefox */
+.pin-input::-webkit-outer-spin-button,
+.pin-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.pin-error {
+  font-size: 0.85rem;
+  color: var(--rojo);
+  margin-top: -0.25rem;
+}
+
+/* ── PANTALLA PRONÓSTICOS ── */
+.pantalla-pronosticos {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bienvenida-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 1.25rem 1.5rem;
+}
+
+.bienvenida-emoji {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.bienvenida-nombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--blanco);
+}
+
+.bienvenida-desc {
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+  margin-top: 0.2rem;
+}
+
+/* ── PROGRESO ── */
+.progreso-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progreso-texto {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.progreso-listo {
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.progreso-barra-bg {
+  height: 6px;
+  background: var(--fondo-card2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progreso-barra-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--celeste-vivo), var(--celeste));
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ── JORNADA ── */
+.jornada-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.partidos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── PARTIDO CARD ── */
+.partido-card {
+  background: var(--fondo-card);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s;
+}
+
+.partido-card--completo {
+  border-color: rgba(63, 185, 80, 0.4);
+}
+
+.partido-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--texto-suave);
+}
+
+/* ── FILA PARTIDO ── */
+.partido-fila {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.equipo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.equipo-bandera {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.equipo-nombre {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+/* ── INPUTS GOLES ── */
+.partido-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.goles-input {
+  width: 48px;
+  height: 48px;
+  background: var(--fondo-card2);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+  color: var(--blanco);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+}
+.goles-input:focus {
+  border-color: var(--celeste-vivo);
+}
+.goles-input::-webkit-outer-spin-button,
+.goles-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.partido-guion {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+/* ── BOTÓN ENVIAR ── */
+.btn-enviar {
+  margin-top: 0.5rem;
+}
+
+/* ── PANTALLA ÉXITO ── */
+.pantalla-exito {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.exito-card {
+  width: 100%;
+  background: var(--fondo-card);
+  border: 1px solid rgba(63, 185, 80, 0.3);
+  border-radius: var(--radio-lg);
+  padding: 2.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.exito-icono {
+  font-size: 3.5rem;
+}
+
+.exito-titulo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--blanco);
+}
+
+.exito-desc {
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.exito-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--fondo-card2);
+  border-radius: var(--radio);
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  text-align: left;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+  padding: 1rem;
+  border-top: 1px solid var(--borde);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 400px) {
+  .equipo-bandera {
+    font-size: 1.6rem;
+  }
+  .equipo-nombre {
+    font-size: 0.7rem;
+  }
+  .goles-input {
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+  }
+  .partido-info {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primario,
+  .progreso-barra-fill,
+  .spinner {
+    transition: none;
+    animation: none;
+  }
+}
