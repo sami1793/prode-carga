@@ -58,7 +58,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <p>Prode organizado con ❤️ · {new Date().getFullYear()}</p>
+        <p>Prode organizado con ❤️por Sami · {new Date().getFullYear()}</p>
       </footer>
     </div>
   );
