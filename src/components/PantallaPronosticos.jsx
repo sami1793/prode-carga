@@ -207,7 +207,11 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
                         placeholder="–"
                         value={pron.goles_local}
                         onChange={(e) =>
-                          handleGoles(partido.id, "goles_local", e.target.value)
+                          handleGoles(
+                            partido.id,
+                            "goles_local",
+                            e.target.value.replace(/[^0-9]/g, ""),
+                          )
                         }
                         inputMode="numeric"
                       />
@@ -223,7 +227,7 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
                           handleGoles(
                             partido.id,
                             "goles_visitante",
-                            e.target.value,
+                            e.target.value.replace(/[^0-9]/g, ""),
                           )
                         }
                         inputMode="numeric"
