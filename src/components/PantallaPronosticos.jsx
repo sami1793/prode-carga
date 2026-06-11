@@ -24,20 +24,46 @@ const BANDERAS = {
   Jordania: "jo",
 };
 
+// Re-evalúa el estado de bloqueo cada segundo
+function useTiempoActual() {
+  const [ahora, setAhora] = useState(Date.now());
+  useEffect(() => {
+    const intervalo = setInterval(() => setAhora(Date.now()), 1000);
+    return () => clearInterval(intervalo);
+  }, []);
+  return ahora;
+}
+
 // ── Determina si un partido ya comenzó ──
 // fecha: "11/06/2026", hora: "16:00" → ambos strings desde el Sheet
-function partidoEmpezado(fecha, hora) {
+function partidoEmpezado(fecha, hora, ahora) {
   try {
-    // Parsear "DD/MM/YYYY" y "HH:MM"
     const [dia, mes, anio] = fecha.split("/").map(Number);
     const [hh, mm] = hora.split(":").map(Number);
-
-    // Construir fecha en UTC-3 (Argentina)
-    // Date.UTC da UTC, le sumamos 3 horas para convertir AR → UTC
     const inicioUTC = Date.UTC(anio, mes - 1, dia, hh + 3, mm);
-    return Date.now() >= inicioUTC;
+    return ahora >= inicioUTC;
   } catch {
-    return false; // si hay error de parseo, no bloqueamos
+    return false;
+  }
+}
+
+function calcularCountdown(fecha, hora, ahora) {
+  try {
+    const [dia, mes, anio] = fecha.split("/").map(Number);
+    const [hh, mm] = hora.split(":").map(Number);
+    const inicioUTC = Date.UTC(anio, mes - 1, dia, hh + 3, mm);
+    const diff = inicioUTC - ahora;
+    if (diff <= 0) return null;
+
+    const horas = Math.floor(diff / 3600000);
+    const minutos = Math.floor((diff % 3600000) / 60000);
+    const segundos = Math.floor((diff % 60000) / 1000);
+
+    if (horas > 0) return `${horas}h ${String(minutos).padStart(2, "0")}m`;
+    if (minutos > 0) return `${minutos}m ${String(segundos).padStart(2, "0")}s`;
+    return `${segundos}s`;
+  } catch {
+    return null;
   }
 }
 
@@ -47,6 +73,7 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
   const [cargando, setCargando] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
+  const ahora = useTiempoActual();
 
   useEffect(() => {
     fetch(`${SCRIPT_URL}?accion=partidos`)
@@ -78,7 +105,7 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
   // Un partido bloqueado cuenta como "completado" automáticamente
   // (sus puntos serán 0 pero no impide el envío)
   function estaCompleto(partido) {
-    if (partidoEmpezado(partido.fecha, partido.hora)) return true;
+    if (partidoEmpezado(partido.fecha, partido.hora, ahora)) return true;
     const pron = pronosticos[partido.id];
     return pron && pron.goles_local !== "" && pron.goles_visitante !== "";
   }
@@ -96,7 +123,7 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
     const payload = {
       pin: usuario.pin,
       pronosticos: partidos.map((p) => {
-        const bloqueado = partidoEmpezado(p.fecha, p.hora);
+        const bloqueado = partidoEmpezado(p.fecha, p.hora, ahora);
         return {
           partido_id: p.id,
           goles_local: bloqueado
@@ -175,7 +202,16 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
           <h2 className="section-title">Fecha {jornada}</h2>
           <div className="partidos-lista">
             {ps.map((partido) => {
-              const bloqueado = partidoEmpezado(partido.fecha, partido.hora);
+              const bloqueado = partidoEmpezado(
+                partido.fecha,
+                partido.hora,
+                ahora,
+              );
+              const countdown = calcularCountdown(
+                partido.fecha,
+                partido.hora,
+                ahora,
+              );
               const pron = pronosticos[partido.id] || {
                 goles_local: "",
                 goles_visitante: "",
@@ -194,8 +230,14 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
                     <span className="partido-fecha">
                       {partido.fecha} · {partido.hora}
                     </span>
-                    {bloqueado && (
+                    {bloqueado ? (
                       <span className="partido-badge-cerrado">⏱ Cerrado</span>
+                    ) : (
+                      countdown && (
+                        <span className="partido-countdown">
+                          Cierra en: {countdown}
+                        </span>
+                      )
                     )}
                   </div>
 
