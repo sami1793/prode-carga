@@ -24,16 +24,32 @@ const BANDERAS = {
   Jordania: "jo",
 };
 
+// ── Determina si un partido ya comenzó ──
+// fecha: "11/06/2026", hora: "16:00" → ambos strings desde el Sheet
+function partidoEmpezado(fecha, hora) {
+  try {
+    // Parsear "DD/MM/YYYY" y "HH:MM"
+    const [dia, mes, anio] = fecha.split("/").map(Number);
+    const [hh, mm] = hora.split(":").map(Number);
+
+    // Construir fecha en UTC-3 (Argentina)
+    // Date.UTC da UTC, le sumamos 3 horas para convertir AR → UTC
+    const inicioUTC = Date.UTC(anio, mes - 1, dia, hh + 3, mm);
+    return Date.now() >= inicioUTC;
+  } catch {
+    return false; // si hay error de parseo, no bloqueamos
+  }
+}
+
 export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
   const [partidos, setPartidos] = useState([]);
-  const [pronosticos, setPronosticos] = useState({}); // { partido_id: { goles_local, goles_visitante } }
+  const [pronosticos, setPronosticos] = useState({});
   const [cargando, setCargando] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
 
-  // ── Cargar partidos al montar ──
   useEffect(() => {
-    fetch(`${SCRIPT_URL}?accion=partidos`, { redirect: "follow" })
+    fetch(`${SCRIPT_URL}?accion=partidos`)
       .then((r) => r.json())
       .then((data) => {
         if (data.ok) {
@@ -52,7 +68,6 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
   }, []);
 
   function handleGoles(partidoId, equipo, valor) {
-    // Solo permitir números entre 0 y 99
     const num = valor.replace(/[^0-9]/g, "").slice(0, 2);
     setPronosticos((prev) => ({
       ...prev,
@@ -60,27 +75,38 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
     }));
   }
 
-  // ── Validar que todos los partidos tienen pronóstico completo ──
+  // Un partido bloqueado cuenta como "completado" automáticamente
+  // (sus puntos serán 0 pero no impide el envío)
+  function estaCompleto(partido) {
+    if (partidoEmpezado(partido.fecha, partido.hora)) return true;
+    const pron = pronosticos[partido.id];
+    return pron && pron.goles_local !== "" && pron.goles_visitante !== "";
+  }
+
   function todosCompletos() {
-    return partidos.every((p) => {
-      const pron = pronosticos[p.id];
-      return pron && pron.goles_local !== "" && pron.goles_visitante !== "";
-    });
+    return partidos.every((p) => estaCompleto(p));
   }
 
   async function handleEnvio() {
     if (!todosCompletos()) return;
-
     setEnviando(true);
     setError(null);
 
+    // Los partidos bloqueados se envían con 0-0 por defecto
     const payload = {
       pin: usuario.pin,
-      pronosticos: partidos.map((p) => ({
-        partido_id: p.id,
-        goles_local: parseInt(pronosticos[p.id].goles_local),
-        goles_visitante: parseInt(pronosticos[p.id].goles_visitante),
-      })),
+      pronosticos: partidos.map((p) => {
+        const bloqueado = partidoEmpezado(p.fecha, p.hora);
+        return {
+          partido_id: p.id,
+          goles_local: bloqueado
+            ? 0
+            : parseInt(pronosticos[p.id]?.goles_local || 0),
+          goles_visitante: bloqueado
+            ? 0
+            : parseInt(pronosticos[p.id]?.goles_visitante || 0),
+        };
+      }),
     };
 
     try {
@@ -89,7 +115,6 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-
       if (data.ok) {
         onEnvioExitoso();
       } else {
@@ -102,30 +127,20 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
     }
   }
 
-  // ── Agrupar partidos por jornada ──
   const jornadas = partidos.reduce((acc, p) => {
-    const j = p.jornada;
-    if (!acc[j]) acc[j] = [];
-    acc[j].push(p);
+    if (!acc[p.jornada]) acc[p.jornada] = [];
+    acc[p.jornada].push(p);
     return acc;
   }, {});
 
-  const completados = partidos.filter((p) => {
-    const pron = pronosticos[p.id];
-    return pron && pron.goles_local !== "" && pron.goles_visitante !== "";
-  }).length;
+  const completados = partidos.filter((p) => estaCompleto(p)).length;
 
-  if (cargando) {
-    return <p className="estado-msg">Cargando partidos…</p>;
-  }
-
-  if (error && partidos.length === 0) {
+  if (cargando) return <p className="estado-msg">Cargando partidos…</p>;
+  if (error && partidos.length === 0)
     return <p className="estado-msg error">{error}</p>;
-  }
 
   return (
     <div className="pantalla-pronosticos">
-      {/* Bienvenida */}
       <div className="bienvenida-card">
         <span className="bienvenida-emoji">👋</span>
         <div>
@@ -136,7 +151,6 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         </div>
       </div>
 
-      {/* Progreso */}
       <div className="progreso-wrap">
         <div className="progreso-texto">
           <span>
@@ -156,26 +170,23 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         </div>
       </div>
 
-      {/* Partidos agrupados por jornada */}
       {Object.entries(jornadas).map(([jornada, ps]) => (
         <section key={jornada} className="jornada-seccion">
           <h2 className="section-title">Fecha {jornada}</h2>
-
           <div className="partidos-lista">
             {ps.map((partido) => {
+              const bloqueado = partidoEmpezado(partido.fecha, partido.hora);
               const pron = pronosticos[partido.id] || {
                 goles_local: "",
                 goles_visitante: "",
               };
-              const completo =
-                pron.goles_local !== "" && pron.goles_visitante !== "";
+              const completo = estaCompleto(partido);
 
               return (
                 <div
                   key={partido.id}
-                  className={`partido-card ${completo ? "partido-card--completo" : ""}`}
+                  className={`partido-card ${completo ? "partido-card--completo" : ""} ${bloqueado ? "partido-card--bloqueado" : ""}`}
                 >
-                  {/* Info del partido */}
                   <div className="partido-info">
                     <span className="partido-estadio">
                       🏟 {partido.estadio}
@@ -183,11 +194,12 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
                     <span className="partido-fecha">
                       {partido.fecha} · {partido.hora}
                     </span>
+                    {bloqueado && (
+                      <span className="partido-badge-cerrado">⏱ Cerrado</span>
+                    )}
                   </div>
 
-                  {/* Fila de pronóstico */}
                   <div className="partido-fila">
-                    {/* Equipo local */}
                     <div className="equipo equipo--local">
                       <span
                         className={`fi fi-${BANDERAS[partido.equipo_local] || "un"} equipo-bandera`}
@@ -197,44 +209,50 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
                       </span>
                     </div>
 
-                    {/* Inputs */}
                     <div className="partido-inputs">
-                      <input
-                        className="goles-input"
-                        type="number"
-                        min="0"
-                        max="99"
-                        placeholder="–"
-                        value={pron.goles_local}
-                        onChange={(e) =>
-                          handleGoles(
-                            partido.id,
-                            "goles_local",
-                            e.target.value.replace(/[^0-9]/g, ""),
-                          )
-                        }
-                        inputMode="numeric"
-                      />
-                      <span className="partido-guion">:</span>
-                      <input
-                        className="goles-input"
-                        type="number"
-                        min="0"
-                        max="99"
-                        placeholder="–"
-                        value={pron.goles_visitante}
-                        onChange={(e) =>
-                          handleGoles(
-                            partido.id,
-                            "goles_visitante",
-                            e.target.value.replace(/[^0-9]/g, ""),
-                          )
-                        }
-                        inputMode="numeric"
-                      />
+                      {bloqueado ? (
+                        <span className="partido-bloqueado-label">
+                          Sin pronóstico
+                        </span>
+                      ) : (
+                        <>
+                          <input
+                            className="goles-input"
+                            type="number"
+                            min="0"
+                            max="99"
+                            placeholder="–"
+                            value={pron.goles_local}
+                            onChange={(e) =>
+                              handleGoles(
+                                partido.id,
+                                "goles_local",
+                                e.target.value.replace(/[^0-9]/g, ""),
+                              )
+                            }
+                            inputMode="numeric"
+                          />
+                          <span className="partido-guion">:</span>
+                          <input
+                            className="goles-input"
+                            type="number"
+                            min="0"
+                            max="99"
+                            placeholder="–"
+                            value={pron.goles_visitante}
+                            onChange={(e) =>
+                              handleGoles(
+                                partido.id,
+                                "goles_visitante",
+                                e.target.value.replace(/[^0-9]/g, ""),
+                              )
+                            }
+                            inputMode="numeric"
+                          />
+                        </>
+                      )}
                     </div>
 
-                    {/* Equipo visitante */}
                     <div className="equipo equipo--visitante">
                       <span
                         className={`fi fi-${BANDERAS[partido.equipo_visitante] || "un"} equipo-bandera`}
@@ -251,10 +269,8 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         </section>
       ))}
 
-      {/* Error de envío */}
       {error && <p className="estado-msg error">{error}</p>}
 
-      {/* Botón enviar */}
       <button
         className={`btn-primario btn-enviar ${!todosCompletos() ? "btn-primario--disabled" : ""}`}
         onClick={handleEnvio}
@@ -267,7 +283,7 @@ export default function PantallaPronosticos({ usuario, onEnvioExitoso }) {
         ) : todosCompletos() ? (
           "Enviar pronósticos 🚀"
         ) : (
-          `Completá todos los partidos (${completados}/${partidos.length})`
+          `Completá los partidos disponibles (${completados}/${partidos.length})`
         )}
       </button>
     </div>

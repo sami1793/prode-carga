@@ -514,3 +514,24 @@ body {
     animation: none;
   }
 }
+
+/* ── PARTIDO BLOQUEADO ── */
+.partido-card--bloqueado {
+  opacity: 0.7;
+  border-color: rgba(139, 151, 171, 0.2);
+}
+
+.partido-badge-cerrado {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #e05c5c;
+  letter-spacing: 0.05em;
+}
+
+.partido-bloqueado-label {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  font-style: italic;
+  padding: 0 0.5rem;
+  text-align: center;
+}
