@@ -1,4 +1,4 @@
-export default function PantallaExito({ usuario }) {
+export default function PantallaExito({ usuario, onVerMisPronosticos }) {
   return (
     <div className="pantalla-exito">
       <div className="exito-card">
@@ -12,6 +12,12 @@ export default function PantallaExito({ usuario }) {
           <span>🏆 Seguí el ranking en la página del torneo</span>
           <span>📱 Te avisamos por WhatsApp cuando haya novedades</span>
         </div>
+        <button
+          className="btn-primario btn-ver-pronosticos"
+          onClick={onVerMisPronosticos}
+        >
+          Ver mis pronósticos →
+        </button>
       </div>
     </div>
   );

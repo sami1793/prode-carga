@@ -372,12 +372,8 @@ body {
 }
 
 .equipo-bandera {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .equipo-nombre {
@@ -536,9 +532,300 @@ body {
   text-align: center;
 }
 
-.partido-countdown {
+/* ══════════════════════════════════════════
+   MIS PRONÓSTICOS
+   ══════════════════════════════════════════ */
+
+.pantalla-mis-pronosticos {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Header usuario ── */
+.mis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 1rem 1.25rem;
+}
+
+.mis-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mis-bienvenida {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--blanco);
+}
+
+.mis-subtitulo {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.btn-cerrar-sesion {
+  background: transparent;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  color: var(--texto-suave);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+  white-space: nowrap;
+}
+.btn-cerrar-sesion:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+}
+
+/* ── Resumen ── */
+.mis-resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: linear-gradient(135deg, #0f2442 0%, #162d50 100%);
+  border: 1px solid rgba(117, 170, 219, 0.3);
+  border-radius: var(--radio-lg);
+  padding: 1.25rem 1rem;
+}
+
+.resumen-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.resumen-valor {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.resumen-label {
   font-size: 0.68rem;
+  color: rgba(117, 170, 219, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.resumen-sep {
+  width: 1px;
+  height: 2.5rem;
+  background: rgba(117, 170, 219, 0.2);
+}
+
+/* ── Lista partidos ── */
+.mis-partidos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── Partido card ── */
+.mis-partido-card {
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mis-partido-card--jugado {
+  border-color: rgba(63, 185, 80, 0.2);
+}
+.mis-partido-card--sin-pron {
+  opacity: 0.6;
+}
+
+/* ── Meta ── */
+.mis-partido-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--texto-suave);
+}
+
+.mis-partido-fecha {
+  font-weight: 600;
+}
+
+/* ── Badges de puntos ── */
+.mis-puntos-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+.pts-oro {
+  background: rgba(245, 200, 66, 0.15);
+  color: #f5c842;
+}
+.pts-celeste {
+  background: rgba(74, 144, 217, 0.15);
+  color: var(--celeste);
+}
+.pts-verde {
+  background: rgba(63, 185, 80, 0.15);
+  color: #3fb950;
+}
+.pts-gris {
+  background: rgba(139, 151, 171, 0.15);
+  color: var(--texto-suave);
+}
+.pts-rojo {
+  background: rgba(224, 92, 92, 0.15);
+  color: var(--rojo);
+}
+.pts-pendiente {
+  background: var(--fondo-card2);
+  color: var(--texto-suave);
+}
+
+/* ── Fila equipos ── */
+.mis-partido-fila {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mis-equipo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.mis-equipo--local {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+.mis-equipo--visitante {
+  justify-content: flex-start;
+}
+
+.mis-bandera {
+  display: inline-block;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.mis-equipo-nombre {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+/* ── Centro: resultado + pronóstico ── */
+.mis-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 70px;
+}
+
+.mis-resultado-real {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(63, 185, 80, 0.08);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+  border-radius: var(--radio);
+  padding: 0.2rem 0.5rem;
+}
+
+.mis-resultado-real--pendiente {
+  background: var(--fondo-card2);
+  border-color: var(--borde);
+}
+
+.mis-gol-real {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--blanco);
+  min-width: 0.8rem;
+  text-align: center;
+}
+
+.mis-vs {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.mis-sep {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(63, 185, 80, 0.5);
+}
+
+/* Pronóstico del usuario */
+.mis-pron {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: var(--fondo-card2);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.15rem 0.4rem;
+}
+
+.mis-gol-pron {
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--celeste);
-  letter-spacing: 0.03em;
+  min-width: 0.8rem;
+  text-align: center;
+}
+
+.mis-sep-pron {
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.mis-pron-label {
+  font-size: 0.68rem;
+  color: var(--texto-suave);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ── Botón ver pronósticos en PantallaExito ── */
+.btn-ver-pronosticos {
+  margin-top: 0.5rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .mis-equipo-nombre {
+    font-size: 0.68rem;
+  }
+  .mis-bandera {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  .mis-gol-real {
+    font-size: 0.9rem;
+  }
 }

@@ -26,7 +26,11 @@ export default function PantallaPin({ onPinValido }) {
       const data = await res.json();
 
       if (data.ok) {
-        onPinValido({ pin: pinLimpio, nombre: data.nombre });
+        onPinValido({
+          pin: pinLimpio,
+          nombre: data.nombre,
+          ya_envio: data.ya_envio,
+        });
       } else {
         setError(data.error || "Código inválido.");
       }
